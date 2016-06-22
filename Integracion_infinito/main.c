@@ -1,18 +1,11 @@
-/*
- * Integracion_infinito.c
- *
- * Created: 20/06/2016 11:17:25 p.m.
- * Author : SARA JULIA
- */ 
 
 #define F_CPU 16000000UL
-
 #include <util/delay.h>
 
 #include "Basic.h"
 #include "Magnetometer_HMC5883L.h"
 #include "Encoder.h"
-#include "Analog.h"
+//#include "Analog.h"
 //#include "Uart.h"
 #include "uart_michel.h"
 #include "motorShield.h"
@@ -27,7 +20,7 @@ int distancia = 0;
 uint8_t dato;
 
 char flag=0;
-unsigned char flag_tiempo = 0, flag_imprimir = 0;
+unsigned char flag_tiempo = 0, flag_imprimir = 0, flag_Motor = 0;
 float heading;
 //int Xmain;
 //int Ymain; 
@@ -39,7 +32,7 @@ char strFlagImprimir[10];
 //unsigned char camera[10];
 
 //char stringx[10];
-//char stringy[10];*/
+//char stringy[10];
 
 int aux = 0;
 
@@ -109,8 +102,15 @@ int aux = 0;
 		rpmcount19=0;
 }*/
 
+ISR(USART0_RX_vect){
+	dato = UDR0;
+	if( (dato == 'F') || (dato == 'B') || (dato == 'R') || (dato == 'L') || (dato == 'S') || (dato == '+') || (dato == '-') ){
+		flag_Motor = 1;
+	}
+}
+
 int main(void){	
-	cli();
+	cli(); //desabilita todas las interrupciones
 	actualSpeed = 50;
 
 	analog_init();
@@ -118,6 +118,7 @@ int main(void){
 	//Serial_begin(Baudios);
 	//Serial1_begin(Baudios);
 	uart_init(0); //Serial de Michel
+		
 	DDRL|=0x02;
 	PORTL=0x00;	
 	Timer4_init();
@@ -127,12 +128,17 @@ int main(void){
 
 	//i2c_init();
 	//init_HMC5883L();
-	sei();
+	sei();	//habilita todas las interrupciones
+	UCSR0B|= (1<<7); //Habilito las interrupciones del USART 0
 	motorShield_stop(0);
 	uart_println(0,"reset");
 	uart_println(0,"iniciar");
 	while (1)
 	{	
+		if(flag_Motor == 1 ) {
+			Teleoperation(dato);
+			flag_Motor = 0;
+		}
 		/*if (flag==1)
 		{
 			//PORTL=0x02;
@@ -140,14 +146,7 @@ int main(void){
 			PORTL=0x00;
 			flag=0;
 		}*/
-		if(uart_available(0)>0){
 		
-		uart_print(0,"holi antes"); // _delay_ms(1);
-		while(uart_available(0)){}
-		dato = uart_read(0);
-		
-		uart_println(0,"     holi despues"); 
-
 		Ultrasonic2 = ultrasonic_read(port2);
 		Ultrasonic1 = ultrasonic_read(port1);
 		CargaBateria = Bateria();
@@ -156,7 +155,6 @@ int main(void){
 		Compass_ReadScaledAxis(&Mag_Scaled[0]);
 		heading = atan2(Mag_Scaled[1],Mag_Scaled[0]) + PI;
 		headingDegrees = heading*(180/PI);
-
 		
 		//_delay_ms(1);
 		//if(flag_imprimir == 4 ){
@@ -170,7 +168,7 @@ int main(void){
 			uart_print(0, "heading: "); uart_println(0,itoa(headingDegrees, hedi, 10)); //_delay_ms(1);
 			uart_print(0,"\n");
 		//}
-		Teleoperation(dato);
+		
 		if(dato == 'F')
 		{
 			PCICR |= (1<<PCIE2); // habilito la interrupcion externa por cambio de estado en el grupo en el cual esta el pin PCINT8 9 10 11
@@ -179,7 +177,6 @@ int main(void){
 		else{
 			PCICR |= (0<<PCIE2); // Deshabilito la interrupcion externa por cambio de estado en el grupo en el cual esta el pin PCINT8 9 10 11
 			_delay_us(5000);
-		}
 		}
 		//_delay_ms(1); //Wait until end last transmission
 	}// FIN WHILE

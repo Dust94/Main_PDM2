@@ -8,18 +8,19 @@
 
 #include <stdlib.h>
 
-#include "Uart.h"
+//#include "Uart.h"
+#include "uart_michel.h" 
 #include "Analog.h"
 
-#define Baudios 57600
+//#define Baudios 57600
 #define port1 14
 #define port2 15
 
 unsigned int Ultrasonic1=0;
 unsigned int Ultrasonic2=0;
 
-const unsigned char NL[] PROGMEM = "\r\n";
-const unsigned char MessageCM[] PROGMEM = " cm";
+//const unsigned char NL[] PROGMEM = "\r\n";
+//const unsigned char MessageCM[] PROGMEM = " cm";
 
 void Timer4_init(void)
 {
@@ -30,9 +31,7 @@ void Timer4_init(void)
 	
 	// cálculo de OCR1A:
 	// (1/16us)x(1024)x(OCR1A + 1) = 100 ms ---> OCR1A = 1562
-	
 	OCR4A = 1562*6;
-
 	TIMSK4 = (1<<OCIE4A);
 }
 
@@ -84,10 +83,13 @@ void UltrasonicPrint(unsigned int dato)
 		string[1]=dato/10 + 48;
 		string[2]=dato%10 + 48;
 	}
-	Serial_write(&string[0]);
-	uart_print(0," ");
+	uart_print(0,&string[0]);
+	//Serial_write(&string[0]);
+	//uart_print(0," ");
 	//Serial_print(&MessageCM[0]);
-	Serial_print(&NL[0]);
+	uart_println(0, " cm");
+	//uart_print(0, &NL[0]);
+	//Serial_print(&NL[0]);
 }
 
 
