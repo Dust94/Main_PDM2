@@ -82,6 +82,8 @@ void init_HMC5883L(void){
 
 
 void Read_Compass(uint8_t buffer[], uint8_t length){
+	
+	
 	i2c_start_wait(HMC5883L_WRITE);
 	i2c_write(DataOutputX_MSB); //set pointer to X-axis MSB	
 	i2c_stop();

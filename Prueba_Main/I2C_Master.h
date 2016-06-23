@@ -29,9 +29,10 @@
 #define TW_STATUS       (TWSR & TW_STATUS_MASK)
 
 void i2c_init(void){
-  //PORTC|= ((1<<SDA_Mega)|(1<<SCL_Mega));  //activa resistencias pull upp para SCL y SDA
+  PORTC|= ((1<<SDA_Mega)|(1<<SCL_Mega));  //activa resistencias pull upp para SCL y SDA
   TWSR = 0; //Preescalador = 1 
   TWBR = ((F_CPU/SCL_CLOCK)-16)/2; // Velocidad de 100 kHz clock, fosc_CPU=F_CPU, Preescalador=1
+  //TWCR |= (1<<TWIE); //TWI Enable Interrupt Habilitado
 }
 
 /*************************************************************************	

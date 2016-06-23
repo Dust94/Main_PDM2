@@ -71,9 +71,33 @@ void motorShield_setSpeed(uint8_t motor, int speed)
 	}
 	
 	
-	if (reverse)
-	{
-		switch(motor)
+	if (reverse){
+		if(motor == 1){
+			OCR1A= speed * 8; // Shield 2
+			cbi(PORTA,PA4); //Motor A salida pin PA5 a M1INA
+			sbi(PORTA,PA5);	//Motor A salida pin PA4 a M1INB
+			leftSpeed = speed;
+		}
+		if(motor == 2){
+			OCR1B= speed * 8; // Shield 2
+			cbi(PORTA,PA7); //Motor B salida pin PA6 a M2INA
+			sbi(PORTA,PA6);	//Motor B salida pin PA7 a M2INB
+			rightSpeed = speed;
+		}
+		if(motor == 3){
+			OCR3A= speed * 8; // Shield 1
+			cbi(PORTA,PA3); //Motor A salida pin PA3 a M1INA
+			sbi(PORTA,PA2);	//Motor A salida pin PA2 a M1INB
+			leftSpeed = speed;
+		}
+		if(motor == 4){
+			OCR3C= speed * 8; // Shield 1
+			cbi(PORTA,PA0); //Motor B salida pin PA1 a M2INA
+			sbi(PORTA,PA1);	//Motor B salida pin PA0 a M2INB
+			rightSpeed = speed;
+		}	
+		
+		/*switch(motor)
 		{
 			case 1:
 						OCR1A= speed * 8; // Shield 2
@@ -104,13 +128,34 @@ void motorShield_setSpeed(uint8_t motor, int speed)
 						sbi(PORTA,PA1);	//Motor B salida pin PA0 a M2INB
 						rightSpeed = speed;
 						break;
+		}*/
+	} else{
+		if(motor == 1){
+			OCR1A= speed * 8; // Shield 2
+			sbi(PORTA,PA4); //Motor A salida pin PA5 a M1INA
+			cbi(PORTA,PA5);	//Motor A salida pin PA4 a M1INB
+			leftSpeed = speed;
 		}
-	} 
-	
-	else
-	{
-		switch(motor)
-		{
+		if(motor == 2){
+			OCR1B= speed * 8; // Shield 2
+			sbi(PORTA,PA7); //Motor B salida pin PA6 a M2INA
+			cbi(PORTA,PA6);	//Motor B salida pin PA7 a M2INB
+			rightSpeed = speed;
+		}
+		if(motor == 3){
+			OCR3A= speed * 8; // Shield 1
+			sbi(PORTA,PA3); //Motor A salida pin PA3 a M1INA
+			cbi(PORTA,PA2);	//Motor A salida pin PA2 a M1INB
+			leftSpeed = speed;
+		}
+		if(motor == 4){
+			OCR3C= speed * 8; // Shield 1
+			sbi(PORTA,PA0); //Motor B salida pin PA1 a M2INA
+			cbi(PORTA,PA1);	//Motor B salida pin PA0 a M2INB
+			rightSpeed = speed;
+		}
+		/*
+		switch(motor){
 			case 1:
 						OCR1A= speed * 8; // Shield 2
 						sbi(PORTA,PA4); //Motor A salida pin PA5 a M1INA
@@ -126,7 +171,6 @@ void motorShield_setSpeed(uint8_t motor, int speed)
 						break;
 			
 			case 3:
-			
 						OCR3A= speed * 8; // Shield 1
 						sbi(PORTA,PA3); //Motor A salida pin PA3 a M1INA
 						cbi(PORTA,PA2);	//Motor A salida pin PA2 a M1INB
@@ -140,9 +184,9 @@ void motorShield_setSpeed(uint8_t motor, int speed)
 						cbi(PORTA,PA1);	//Motor B salida pin PA0 a M2INB
 						rightSpeed = speed;
 						break;
-		}
-	}
-}
+		}*/
+	} //Fin Else
+} // Fin Metodo
 
 
 void motorShield_setBrake(uint8_t motor, int speed)
@@ -157,8 +201,32 @@ void motorShield_setBrake(uint8_t motor, int speed)
 		speed = 100;
 	}
 	
-	switch(motor)
-	{
+	if(motor == 1){
+		OCR1A= speed * 8; // Shield 2
+		cbi(PORTA,PA4); //Motor A salida pin PA5 a M1INA
+		cbi(PORTA,PA5);	//Motor A salida pin PA4 a M1INB
+		leftSpeed = speed;
+	}
+	if(motor == 2){
+		OCR1B= speed * 8; // Shield 2
+		cbi(PORTA,PA7); //Motor B salida pin PA6 a M2INA
+		cbi(PORTA,PA6);	//Motor B salida pin PA7 a M2INB
+		rightSpeed = speed;
+	}
+	if(motor == 3){
+		OCR3A= speed * 8; // Shield 1
+		cbi(PORTA,PA3); //Motor A salida pin PA3 a M1INA
+		cbi(PORTA,PA2);	//Motor A salida pin PA2 a M1INB
+		leftSpeed = speed;
+	}
+	if(motor == 4){
+		OCR3C= speed * 8; // Shield 1
+		cbi(PORTA,PA0); //Motor B salida pin PA1 a M2INA
+		cbi(PORTA,PA1);	//Motor B salida pin PA0 a M2INB
+		rightSpeed = speed;
+	}
+	/*
+	switch(motor){
 			case 1:
 						OCR1A= speed * 8; // Shield 2
 						cbi(PORTA,PA4); //Motor A salida pin PA5 a M1INA
@@ -188,14 +256,41 @@ void motorShield_setBrake(uint8_t motor, int speed)
 						cbi(PORTA,PA1);	//Motor B salida pin PA0 a M2INB
 						rightSpeed = speed;
 						break;
-	}
+	}*/
 	
 }
 
-void motorShield_move(int movement, int speed)
-{
-	switch(movement)
-	{
+void motorShield_move(int movement, int speed){
+	if(movement == 1){
+		motorShield_setSpeed(MOTOR_A,-speed);
+		motorShield_setSpeed(MOTOR_B,speed);
+		motorShield_setSpeed(MOTOR_C,speed);
+		motorShield_setSpeed(MOTOR_D,speed);
+		state = Forward;
+	}
+	if(movement == 2){
+		motorShield_setSpeed(MOTOR_A,speed);
+		motorShield_setSpeed(MOTOR_B,-speed);
+		motorShield_setSpeed(MOTOR_C,-speed);
+		motorShield_setSpeed(MOTOR_D,-speed);
+		state = Backward;
+	}
+	if(movement == 3){
+		motorShield_setSpeed(MOTOR_A,-speed);
+		motorShield_setSpeed(MOTOR_B,speed);
+		motorShield_setSpeed(MOTOR_C,-speed);
+		motorShield_setSpeed(MOTOR_D,-speed);
+		state = TurnRight;
+	}
+	if(movement == 4){
+		motorShield_setSpeed(MOTOR_A,speed);
+		motorShield_setSpeed(MOTOR_B,-speed);
+		motorShield_setSpeed(MOTOR_C,speed);
+		motorShield_setSpeed(MOTOR_D,speed);
+		state = TurnLeft;
+	}
+	/*
+	switch(movement){
 	
 	case 1:
 					motorShield_setSpeed(MOTOR_A,-speed);
@@ -230,7 +325,7 @@ void motorShield_move(int movement, int speed)
 					motorShield_setSpeed(MOTOR_D,speed);
 					state = TurnLeft;
 					break;
-	}
+	}*/
 }
 
 void motorShield_stop(int speed)
@@ -262,6 +357,14 @@ void speedDown(int speed)
 
 void Teleoperation(uint8_t command)
 {
+	if(command == 'F') motorShield_move(Forward,actualSpeed);
+	if(command == 'B') motorShield_move(Backward,actualSpeed);
+	if(command == 'R') motorShield_move(TurnRight,actualSpeed);
+	if(command == 'L') motorShield_move(TurnLeft,actualSpeed);
+	if(command == 'S') motorShield_stop(100);
+	if(command == '+') speedUp(actualSpeed);
+	if(command == '-') speedDown(actualSpeed);
+	/*
 	switch(command)
 	{
 		case 'F': motorShield_move(Forward,actualSpeed);
@@ -277,9 +380,8 @@ void Teleoperation(uint8_t command)
 		case '+': speedUp(actualSpeed);
 		break;
 		case '-': speedDown(actualSpeed);
-		break;
-		
-	}
+		break;		
+	}*/
 }
 
 #endif
